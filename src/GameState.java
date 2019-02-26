@@ -41,8 +41,8 @@ public class GameState {
 	public GameState(int[][] board, int playerToTakeTurn) {
 		this.size = board.length;
 		this.board = new int[size][size];
-		for (int i = 0; i < size; i++){
-			for (int j = 0; j < size; j++){
+		for(int i = 0; i < size; i++) {
+			for(int j = 0; j < size; j++) {
 				this.board[i][j] = board[i][j];
 			}
 		}
@@ -148,19 +148,19 @@ public class GameState {
      */
     public ArrayList<Position> legalMoves() {
     	ArrayList<Position> posPlaces = new ArrayList<Position>();
-    	for (int i = 0; i < this.size; i++) {
-    		for (int j = 0; j < this.size; j++) {
-    			if ( board[i][j] == 0 ){
+    	for(int i = 0; i < this.size; i++) {
+    		for(int j = 0; j < this.size; j++) {
+    			if(board[i][j] == 0) {
     				posPlaces.add(new Position(i,j));
     			}
     		}
     	}
 
     	ArrayList<Position> legalPlaces = new ArrayList<Position>();
-    	for (Position p: posPlaces){
-    		for (int deltaX = -1; deltaX <= 1; deltaX++) {
-    			for (int deltaY = -1; deltaY <= 1; deltaY++) {
-    				if ( captureInDirection(p, deltaX, deltaY) > 0 ) {
+    	for(Position p: posPlaces) {
+    		for(int deltaX = -1; deltaX <= 1; deltaX++) {
+    			for(int deltaY = -1; deltaY <= 1; deltaY++) {
+    				if(captureInDirection(p, deltaX, deltaY) > 0) {
     	    			legalPlaces.add(p);
     				}
     			}

@@ -32,8 +32,8 @@ public class OthelloGUI extends JComponent implements MouseListener
 	
     /**
      * Initializes game
-     * @param player1 The AI for player 1 (black); this argument is ignored if there is indeed a human player.
-     * @param player2 The AI for player 2 (white).
+     * @param ai1 The AI for player 1 (black); this argument is ignored if there is indeed a human player.
+     * @param ai2 The AI for player 2 (white).
      * @param size The number of rows and columns of the game board. Should be an
      * even number greater or equal to 4.
      * @param humanPlayer true if there is a (one) human player
@@ -105,11 +105,20 @@ public class OthelloGUI extends JComponent implements MouseListener
     		else
     			g.drawImage(tie, size*imgSize/2-(imgSize/2), size*imgSize/2+(imgSize/4), this);
 
+    		// added by me to print average time per decision made by SmarterAI
+			if(ai1.getClass().equals(SmarterAI.class)) {
+				SmarterAI sai = (SmarterAI) ai1;
+				double[] times = sai.getTimes();
+				System.out.println("Avg: " + times[0] + " Max: " + times[1]);
+			}
+
     		if(ai2.getClass().equals(SmarterAI.class)) {
 				SmarterAI sai = (SmarterAI) ai2;
 				double[] times = sai.getTimes();
 				System.out.println("Avg: " + times[0] + " Max: " + times[1]);
 			}
+
+
     	}		
     }
 

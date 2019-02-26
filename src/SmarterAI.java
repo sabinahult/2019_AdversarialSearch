@@ -6,7 +6,7 @@ import java.util.List;
  */
 
 public class SmarterAI implements IOthelloAI {
-    List<Double> times;
+    private List<Double> times;
 
     public SmarterAI() {
         times = new ArrayList<>();
@@ -17,8 +17,9 @@ public class SmarterAI implements IOthelloAI {
      */
     public Position decideMove(GameState s) {
         double start = System.currentTimeMillis();
-        Position move = MINIMAX.decision(s);
+        //Position move = MINIMAX.decision(s);
         //Position move = MINIMAXAB.alphaBetaSearch(s);
+        Position move = HMINIMAX.decision(s);
         times.add(System.currentTimeMillis()-start);
 
         return move;
