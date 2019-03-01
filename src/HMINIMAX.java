@@ -5,8 +5,14 @@
  */
 @SuppressWarnings("Duplicates")
 public class HMINIMAX {
-    private static final int CUTOFF_D = 6;
+    private static final int CUTOFF_DEPTH = 6;
 
+    /**
+     * Returns the best move for the current player to make as decided by heuristic MINIMAX where the evaluation
+     * function is based on how many good (corner and edge) positions each player holds at the cutoff depth
+     * @param s the current game state
+     * @return the guessed best move
+     */
     public static Position decision(GameState s) {
         Position move = null;
         int max_value = Integer.MIN_VALUE;
@@ -23,9 +29,13 @@ public class HMINIMAX {
         return move;
     }
 
+    /**
+     * @param s the current game state
+     * @param p move to be made
+     * @return the game state where the move has been made
+     */
     private static GameState result(GameState s, Position p) {
         GameState n = new GameState(s.getBoard(), s.getPlayerInTurn());
-        //System.out.println("Inserting [" + p.col + ", " + p.row + "]");
         if(n.insertToken(p)) return n;
 
         // if inserting a token is unsuccessful, then change player
@@ -35,23 +45,22 @@ public class HMINIMAX {
 
     private static int maxValue(GameState s, int alpha, int beta, int d) {
         if(cutoffTest(s, d)) return eval(s);
+        d++;
 
         int v = Integer.MIN_VALUE;
-        d++;
         for(Position p : s.legalMoves()) {
             v = Math.max(v, minValue(result(s, p), alpha, beta, d));
             if(v >= beta) return v;
             alpha = alpha > v ? alpha : v;
         }
 
-
         return v;
     }
 
     private static int minValue(GameState s, int alpha, int beta, int d) {
         if(cutoffTest(s, d)) return eval(s);
-
         d++;
+
         int v = Integer.MAX_VALUE;
         for(Position p : s.legalMoves()) {
             v = Math.min(v, maxValue(result(s, p), alpha, beta, d));
@@ -62,22 +71,31 @@ public class HMINIMAX {
         return v;
     }
 
+    /**
+     * Testing if the cutoff depth has been reached
+     * @param s the gamestate
+     * @param d the current depth of the gametree
+     * @return true if current depth >= the cutoff depth
+     */
     private static boolean cutoffTest(GameState s, int d) {
-        //System.out.println("Player: " + s.getPlayerInTurn() + " d: " + d);
         if(terminalTest(s)) return true;
-        return d >= CUTOFF_D;
+        return d >= CUTOFF_DEPTH;
     }
 
+    /**
+     * Testing if this state is a terminal state
+     * @param s the gamestate
+     * @return true if this state is a terminal gamestate
+     */
     private static boolean terminalTest(GameState s) {
         return s.isFinished();
     }
 
-
     /**
-     * Evaluation based on how many "good" positions, ie. corner and edge positions, each player holds
-     * at this current state. The higher the number, the more good positions black holds. This should
-     * work because max will maximize and min will minimize. What I don't know if whether this is a
-     * good prediction for winning...
+     * Evaluation function based on how many "good" positions, ie. corner and edge positions, each player
+     * holds at this current state. The higher the number, the more good positions black holds. This should
+     * work because max will maximize and min will minimize. What I don't know if this is a good prediction
+     * for winning...
      */
     private static int eval(GameState s) {
         // if the state at depth d is actually a terminal state, then return utility
@@ -111,6 +129,11 @@ public class HMINIMAX {
         return eval;
     }
 
+    /**
+     * Returns the utility value for a terminal gamestate
+     * @param s the gamestate
+     * @return 1 if black wins, 0 if it's a drw and -1 if white wins
+     */
     private static int utility(GameState s) {
         int[] tokens = s.countTokens();
 

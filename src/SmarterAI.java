@@ -2,9 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An attempt at a smarter AI using the MINIMAX algorithm for move decisions.
+ * An attempt at a smarter AI (than DumAI) using either the MINIMAX algorithm, MINIMAX with alpha-beta
+ * pruning or H-MINIMAX for move decisions.
  */
-
 public class SmarterAI implements IOthelloAI {
     private List<Double> times;
 
@@ -13,7 +13,9 @@ public class SmarterAI implements IOthelloAI {
     }
 
     /**
-     * Returns the best move given by the MINIMAX algorithm
+     * Calculates the move to make for the given game state.
+     * @param s The current state of the game in which it should be the AI's turn.
+     * @return the position for the best move to make at this current state
      */
     public Position decideMove(GameState s) {
         System.out.print("Deciding move...");
