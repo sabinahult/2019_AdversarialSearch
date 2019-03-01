@@ -28,7 +28,7 @@ public class Othello {
         	try {
                 ai1 = parseGameLogicParam(args[0]);
                 ai2 = parseGameLogicParam(args[1]);
-                if ( ai2 == null ){
+                if(ai2 == null) {
                 	errMsg = "Only the first player can be human";
                 	err = true;
                 }
@@ -58,7 +58,7 @@ public class Othello {
             	try {
             		size = Integer.parseInt(args[2]);
             	
-            		if ( size < 4 || size%2 != 0 ){
+            		if(size < 4 || size%2 != 0) {
             			errMsg = "Board size should be an even number greater than 2";
             		err = true;
             		}

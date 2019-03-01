@@ -2,9 +2,7 @@
  * Author: Sabina Hult
  * Implementation of the MINIMAX algorithm with alpha-beta pruning as it is given in RN p. 170
  */
-
 public class MINIMAXAB {
-
     public static Position alphaBetaSearch(GameState s) {
         Position move = null;
         int max_value = Integer.MIN_VALUE;
@@ -12,7 +10,7 @@ public class MINIMAXAB {
         for(Position p : s.legalMoves()) {
             int val = minValue(result(s, p), Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-            if(val > max_value) {
+            if(val >= max_value) {
                 max_value = val;
                 move = p;
             }
@@ -23,9 +21,10 @@ public class MINIMAXAB {
 
     private static GameState result(GameState s, Position p) {
         GameState n = new GameState(s.getBoard(), s.getPlayerInTurn());
-        n.insertToken(p);
-        n.changePlayer();
+        if(n.insertToken(p)) return n;
 
+        // if inserting a token is unsuccessful, then change player
+        n.changePlayer();
         return n;
     }
 
@@ -34,7 +33,7 @@ public class MINIMAXAB {
 
         int v = Integer.MAX_VALUE;
         for(Position p : s.legalMoves()) {
-            v = Math.max(v, maxValue(result(s, p), alpha, beta));
+            v = Math.min(v, maxValue(result(s, p), alpha, beta));
             if(v <= alpha) return v;
             beta = beta < v ? beta : v;
         }
@@ -47,11 +46,10 @@ public class MINIMAXAB {
 
         int v = Integer.MIN_VALUE;
         for(Position p : s.legalMoves()) {
-            v = Math.min(v, minValue(result(s, p), alpha, beta));
+            v = Math.max(v, minValue(result(s, p), alpha, beta));
             if(v >= beta) return v;
             alpha = alpha > v ? alpha : v;
         }
-
 
         return v;
     }

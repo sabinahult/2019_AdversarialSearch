@@ -13,8 +13,7 @@ import java.io.IOException;
  * @author Mai Ajspur
  * @version 9.2.2018
  */
-public class OthelloGUI extends JComponent implements MouseListener
-{
+public class OthelloGUI extends JComponent implements MouseListener {
     static final long 	serialVersionUID = 1234567890;
 	static final int 	imgSize = 100;
 	
@@ -58,7 +57,7 @@ public class OthelloGUI extends JComponent implements MouseListener
     	this.size = size;
     	this.state = new GameState(size, 1); // Player 1 (human if there is any) goes first
     	this.humanPlayer = humanPlayer;
-    	if ( !humanPlayer )
+    	if(!humanPlayer)
     		this.ai1 = ai1;
     	this.ai2=ai2;
     	this.addMouseListener(this);
@@ -98,54 +97,49 @@ public class OthelloGUI extends JComponent implements MouseListener
 		
     	if(state.isFinished()) {
     		int[] tokens = state.countTokens();
-    		if ( tokens[0] > tokens[1] )
+    		if(tokens[0] > tokens[1])
     			g.drawImage(blackWon, size*imgSize/2-(imgSize/2), size*imgSize/2+(imgSize/4), this);
-    		else if ( tokens[0] < tokens[1] )
+    		else if(tokens[0] < tokens[1])
     			g.drawImage(whiteWon, size*imgSize/2-(imgSize/2), size*imgSize/2+(imgSize/4), this);
     		else
     			g.drawImage(tie, size*imgSize/2-(imgSize/2), size*imgSize/2+(imgSize/4), this);
 
     		// added by me to print average time per decision made by SmarterAI
-			if(ai1.getClass().equals(SmarterAI.class)) {
+			if(ai1 != null && ai1.getClass().equals(SmarterAI.class)) {
 				SmarterAI sai = (SmarterAI) ai1;
 				double[] times = sai.getTimes();
-				System.out.println("Avg: " + times[0] + " Max: " + times[1]);
+				System.out.println("AI1: Avg: " + times[0] + " Max: " + times[1]);
 			}
 
-    		if(ai2.getClass().equals(SmarterAI.class)) {
+    		if(ai2 != null && ai2.getClass().equals(SmarterAI.class)) {
 				SmarterAI sai = (SmarterAI) ai2;
 				double[] times = sai.getTimes();
-				System.out.println("Avg: " + times[0] + " Max: " + times[1]);
+				System.out.println("AI2: Avg: " + times[0] + " Max: " + times[1]);
 			}
-
-
     	}		
     }
 
     public void mouseClicked(MouseEvent e) {
     	int currentPlayer = state.getPlayerInTurn();
-    	if ( !state.isFinished() ) {
+    	if(!state.isFinished()) {
     		Position place = getPlaceForNextToken(e);
-    		if ( state.insertToken(place) ){ // Chosen move is legal
+    		if(state.insertToken(place)) { // Chosen move is legal
 				boolean nextPlayerCannotMove = state.legalMoves().isEmpty();
-   				if ( nextPlayerCannotMove ){ // The next player cannot move
+   				if(nextPlayerCannotMove) { // The next player cannot move
 					repaint();
    					state.changePlayer();
-   					if ( humanPlayer ){ // If there is a human involved, (s)he needs to know this
+   					if(humanPlayer) { // If there is a human involved, (s)he needs to know this
    	  					boolean canMoveAfterwards = !state.legalMoves().isEmpty();
-   	   					if ( canMoveAfterwards ){
+   	   					if(canMoveAfterwards) {
    	   						String message = currentPlayer == 1 ? "Your opponent has no legal moves. It is your turn again." 
    	   													 	    : "You have no legal moves. Your opponent will make another move (click again).";
    	   						JOptionPane.showMessageDialog(this, message);
    	   					}  						
    					}
    				}
- 			}
-   			else 
-   				illegalMoveAttempted(place); 		
+ 			} else illegalMoveAttempted(place);
     		repaint();
     	}
-
     }
     
     /**
@@ -180,10 +174,10 @@ public class OthelloGUI extends JComponent implements MouseListener
     /**
      * Translate the given clicks on the screen to a position on the game board
      */
-    private Position humanSelectedPlace(MouseEvent e){
+    private Position humanSelectedPlace(MouseEvent e) {
     	int x = e.getX();
     	int y = e.getY();
-    	if ( imgSize <= x && x <= imgSize*(size+1) && imgSize <= y && y <= imgSize*(size+1) ){ 
+    	if(imgSize <= x && x <= imgSize*(size+1) && imgSize <= y && y <= imgSize*(size+1)) {
     		return new Position((x-imgSize)/imgSize, (y-imgSize)/imgSize);
     	}
     	return new Position(-1,-1);

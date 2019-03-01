@@ -4,7 +4,6 @@
  */
 
 public class MINIMAX {
-
     public static Position decision(GameState s) {
         Position move = null;
         int max_value = Integer.MIN_VALUE;
@@ -12,7 +11,7 @@ public class MINIMAX {
         for(Position p : s.legalMoves()) {
             int val = minValue(result(s, p));
 
-            if(val > max_value) {
+            if(val >= max_value) {
                 max_value = val;
                 move = p;
             }
@@ -23,21 +22,11 @@ public class MINIMAX {
 
     private static GameState result(GameState s, Position p) {
         GameState n = new GameState(s.getBoard(), s.getPlayerInTurn());
-        n.insertToken(p);
+        if(n.insertToken(p)) return n;
+
+        // if inserting a token is unsuccessful, then change player
         n.changePlayer();
-
         return n;
-    }
-
-    private static int minValue(GameState s) {
-        if(terminalTest(s)) return utility(s);
-
-        int v = Integer.MAX_VALUE;
-        for(Position p : s.legalMoves()) {
-            v = Math.max(v, maxValue(result(s, p)));
-        }
-
-        return v;
     }
 
     private static int maxValue(GameState s) {
@@ -45,7 +34,18 @@ public class MINIMAX {
 
         int v = Integer.MIN_VALUE;
         for(Position p : s.legalMoves()) {
-            v = Math.min(v, minValue(result(s, p)));
+            v = Math.max(v, minValue(result(s, p)));
+        }
+
+        return v;
+    }
+
+    private static int minValue(GameState s) {
+        if(terminalTest(s)) return utility(s);
+
+        int v = Integer.MAX_VALUE;
+        for(Position p : s.legalMoves()) {
+            v = Math.min(v, maxValue(result(s, p)));
         }
 
         return v;

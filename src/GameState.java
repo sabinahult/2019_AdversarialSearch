@@ -53,7 +53,7 @@ public class GameState {
 	/**
 	 * Returns the array representing the board of this game state
 	 */
-	public int[][] getBoard(){
+	public int[][] getBoard() {
 		return board;
 	}
 
@@ -76,14 +76,14 @@ public class GameState {
 	 * Returns true if the game is finished (i.e. none of the players can make any legal moves)
 	 * and false otherwise.
 	 */
-	public boolean isFinished(){
-		if ( !legalMoves().isEmpty() )
+	public boolean isFinished() {
+		if(!legalMoves().isEmpty())
 			return false;
 		else{ //current player has no legal moves
 			changePlayer();
-			if ( legalMoves().isEmpty() ) //next player also has no legal moves
+			if(legalMoves().isEmpty()) //next player also has no legal moves
 				return true;
-			else{
+			else {
 				changePlayer();
 				return false;
 			}
@@ -113,26 +113,26 @@ public class GameState {
 	 * tokens from the opponent is turned, and true is returned. If the move is not legal, false is returned. 
 	 * False is also returned if the given place does not represent a place on the board. 
 	 */
-    public boolean insertToken(Position place) { 
-    	if ( place.col < 0 || place.row < 0 || place.col >= size || place.row >= size ) //not a position on the board
+    public boolean insertToken(Position place) {
+    	if(place.col < 0 || place.row < 0 || place.col >= size || place.row >= size) //not a position on the board
     		return false;
-    	if ( board[place.col][place.row] != 0 ) // The position is not empty
+    	if(board[place.col][place.row] != 0) // The position is not empty
     		return false;
 
     	boolean capturesFound = false;
     	// Capturing all possible opponents of the current player
-    	for (int deltaX = -1; deltaX <= 1; deltaX++){
-    		for (int deltaY = -1; deltaY <= 1; deltaY++){
+    	for(int deltaX = -1; deltaX <= 1; deltaX++) {
+    		for(int deltaY = -1; deltaY <= 1; deltaY++) {
         		int captives = captureInDirection(place, deltaX, deltaY); 
-        		if ( captives > 0){
+        		if(captives > 0) {
         			capturesFound = true;
-        			for ( int i = 1; i <= captives; i++)
+        			for(int i = 1; i <= captives; i++)
         				board[place.col+deltaX*i][place.row+deltaY*i]=currentPlayer;
         		}
         	}		
     	}
     	
-    	if ( capturesFound ) {
+    	if(capturesFound) {
     		// Place the token at the given place
     		board[place.col][place.row] = currentPlayer;
     		this.changePlayer();
@@ -157,7 +157,7 @@ public class GameState {
     	}
 
     	ArrayList<Position> legalPlaces = new ArrayList<Position>();
-    	for(Position p: posPlaces) {
+    	for(Position p : posPlaces) {
     		for(int deltaX = -1; deltaX <= 1; deltaX++) {
     			for(int deltaY = -1; deltaY <= 1; deltaY++) {
     				if(captureInDirection(p, deltaX, deltaY) > 0) {
@@ -182,14 +182,15 @@ public class GameState {
     	int captured = 0;
     	int cc = p.col;
     	int rr = p.row;
-        while ( 0 <= cc+deltaX && cc+deltaX < size && 0 <= rr+deltaY && rr+deltaY < size 
+        while(0 <= cc+deltaX && cc+deltaX < size && 0 <= rr+deltaY && rr+deltaY < size
     			&& board[cc+deltaX][rr+deltaY] == opponent ) {
         	cc = cc + deltaX;
         	rr = rr + deltaY;
         	captured++;
         }
-        if ( 0 <= cc+deltaX && cc+deltaX < size  && 0 <= rr+deltaY && rr+deltaY < size 
-    			&& board[cc+deltaX][rr+deltaY] == currentPlayer && captured > 0 ){
+
+        if(0 <= cc+deltaX && cc+deltaX < size && 0 <= rr+deltaY && rr+deltaY < size
+    			&& board[cc+deltaX][rr+deltaY] == currentPlayer && captured > 0) {
         	return captured;
         }
         else

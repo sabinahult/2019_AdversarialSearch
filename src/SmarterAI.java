@@ -16,12 +16,15 @@ public class SmarterAI implements IOthelloAI {
      * Returns the best move given by the MINIMAX algorithm
      */
     public Position decideMove(GameState s) {
+        System.out.print("Deciding move...");
+
         double start = System.currentTimeMillis();
         //Position move = MINIMAX.decision(s);
         //Position move = MINIMAXAB.alphaBetaSearch(s);
         Position move = HMINIMAX.decision(s);
         times.add(System.currentTimeMillis()-start);
 
+        System.out.println("Inserting [" + move.col + ", " + move.row + "]");
         return move;
     }
 

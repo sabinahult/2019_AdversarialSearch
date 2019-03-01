@@ -1,5 +1,3 @@
-import java.util.List;
-
 /**
  * Author: Sabina Hult
  * Implementation of the H-MINIMAX algorithm with alpha-beta pruning as well as cutoff and an evaluation function
@@ -7,6 +5,7 @@ import java.util.List;
  */
 @SuppressWarnings("Duplicates")
 public class HMINIMAX {
+    private static final int CUTOFF_D = 6;
 
     public static Position decision(GameState s) {
         Position move = null;
@@ -15,7 +14,7 @@ public class HMINIMAX {
         for(Position p : s.legalMoves()) {
             int val = minValue(result(s, p), Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
 
-            if(val > max_value) {
+            if(val >= max_value) {
                 max_value = val;
                 move = p;
             }
@@ -26,31 +25,21 @@ public class HMINIMAX {
 
     private static GameState result(GameState s, Position p) {
         GameState n = new GameState(s.getBoard(), s.getPlayerInTurn());
-        n.insertToken(p);
+        //System.out.println("Inserting [" + p.col + ", " + p.row + "]");
+        if(n.insertToken(p)) return n;
+
+        // if inserting a token is unsuccessful, then change player
         n.changePlayer();
-
         return n;
-    }
-
-    private static int minValue(GameState s, int alpha, int beta, int d) {
-        if(cutoffTest(s, d)) return eval(s);
-
-        int v = Integer.MAX_VALUE;
-        for(Position p : s.legalMoves()) {
-            v = Math.max(v, maxValue(result(s, p), alpha, beta, d++));
-            if(v <= alpha) return v;
-            beta = beta < v ? beta : v;
-        }
-
-        return v;
     }
 
     private static int maxValue(GameState s, int alpha, int beta, int d) {
         if(cutoffTest(s, d)) return eval(s);
 
         int v = Integer.MIN_VALUE;
+        d++;
         for(Position p : s.legalMoves()) {
-            v = Math.min(v, minValue(result(s, p), alpha, beta, d++));
+            v = Math.max(v, minValue(result(s, p), alpha, beta, d));
             if(v >= beta) return v;
             alpha = alpha > v ? alpha : v;
         }
@@ -59,9 +48,24 @@ public class HMINIMAX {
         return v;
     }
 
+    private static int minValue(GameState s, int alpha, int beta, int d) {
+        if(cutoffTest(s, d)) return eval(s);
+
+        d++;
+        int v = Integer.MAX_VALUE;
+        for(Position p : s.legalMoves()) {
+            v = Math.min(v, maxValue(result(s, p), alpha, beta, d));
+            if(v <= alpha) return v;
+            beta = beta < v ? beta : v;
+        }
+
+        return v;
+    }
+
     private static boolean cutoffTest(GameState s, int d) {
+        //System.out.println("Player: " + s.getPlayerInTurn() + " d: " + d);
         if(terminalTest(s)) return true;
-        return d >= 6;
+        return d >= CUTOFF_D;
     }
 
     private static boolean terminalTest(GameState s) {
@@ -79,26 +83,29 @@ public class HMINIMAX {
         // if the state at depth d is actually a terminal state, then return utility
         if(terminalTest(s)) return utility(s);
 
-        // else evaluate good positions for black at this state
+        // calculate an eval based on who has control of valuable positions
         int[][] board = s.getBoard();
         int n = board.length;
         int corner = 5; // just guessing at a weight for corner positions
         int edge = 3; // just guessing at a weight for edge positions
 
-        // vals negated because b = 1 and w = 2, but we want w to be less than b, however the skew in the results will
-        // probably have some effect on the outcome...
-        int eval = (corner * -board[0][0]) + (corner * -board[0][n-1]) + (corner * -board[n-1][0]) + (corner * -board[n-1][n-1]);
+        // corner positions, positive if black, negative if white
+        int eval = board[0][0] == 1 ? corner : -corner;
+        eval += board[0][n-1] == 1 ? corner : -corner;
+        eval += board[n-1][0] == 1 ? corner : -corner;
+        eval += board[n-1][n-1] == 1 ? corner : -corner;
+
 
         // add values for top and bottom row
         for(int i = 0; i < n-1; i++) {
-            eval += edge * -board[i][0];
-            eval += edge * -board[i][n-1];
+            eval += board[i][0] == 1 ? edge : -edge;
+            eval += board[i][n-1] == 1 ? edge : -edge;
         }
 
         // add vals for left and right column
         for(int j = 0; j < n-1; j++) {
-            eval += edge * -board[0][j];
-            eval += edge * -board[n-1][j];
+            eval += board[0][j] == 1 ? edge : -edge;
+            eval += board[n-1][j] == 1 ? edge : -edge;
         }
 
         return eval;
