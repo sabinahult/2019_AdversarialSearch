@@ -1,19 +1,17 @@
 /**
- * Author: Sabina Hult
- * Implementation of the H-MINIMAX algorithm with alpha-beta pruning as well as cutoff and an evaluation function
- * as it is given in RN p. 171
+ * @author Sabina Hult
+ * @version 7.3.2019
+ * Implementation of the H-MINIMAX algorithm with alpha-beta pruning as well as
+ * cutoff and an evaluation function.
  */
 @SuppressWarnings("Duplicates")
 public class HMINIMAX {
     private static final int CUTOFF_DEPTH = 6;
+    // to make the algorithm independent on whether SmarterAI is player 1 (black) or player 2 (white)
+    private static int thisPlayer;
 
-    /**
-     * Returns the best move for the current player to make as decided by heuristic MINIMAX where the evaluation
-     * function is based on how many good (corner and edge) positions each player holds at the cutoff depth
-     * @param s the current game state
-     * @return the guessed best move
-     */
     public static Position decision(GameState s) {
+        thisPlayer = s.getPlayerInTurn();
         Position move = null;
         int max_value = Integer.MIN_VALUE;
 
@@ -29,17 +27,9 @@ public class HMINIMAX {
         return move;
     }
 
-    /**
-     * @param s the current game state
-     * @param p move to be made
-     * @return the game state where the move has been made
-     */
     private static GameState result(GameState s, Position p) {
         GameState n = new GameState(s.getBoard(), s.getPlayerInTurn());
-        if(n.insertToken(p)) return n;
-
-        // if inserting a token is unsuccessful, then change player
-        n.changePlayer();
+        n.insertToken(p);
         return n;
     }
 
@@ -53,7 +43,6 @@ public class HMINIMAX {
             if(v >= beta) return v;
             alpha = alpha > v ? alpha : v;
         }
-
         return v;
     }
 
@@ -71,73 +60,66 @@ public class HMINIMAX {
         return v;
     }
 
-    /**
-     * Testing if the cutoff depth has been reached
-     * @param s the gamestate
-     * @param d the current depth of the gametree
-     * @return true if current depth >= the cutoff depth
-     */
     private static boolean cutoffTest(GameState s, int d) {
         if(terminalTest(s)) return true;
         return d >= CUTOFF_DEPTH;
     }
 
-    /**
-     * Testing if this state is a terminal state
-     * @param s the gamestate
-     * @return true if this state is a terminal gamestate
-     */
     private static boolean terminalTest(GameState s) {
         return s.isFinished();
     }
 
     /**
-     * Evaluation function based on how many "good" positions, ie. corner and edge positions, each player
-     * holds at this current state. The higher the number, the more good positions black holds. This should
-     * work because max will maximize and min will minimize. What I don't know if this is a good prediction
-     * for winning...
+     * Evaluation based on how many "good" positions, ie. corner and edge positions,
+     * each player holds at this current state.
+     * @param s the games tate to evaluate
+     * @return 1 if this player has more valuable positions, -1 if the other player
+     * holds more valuable positions and 0 if it's equal
      */
     private static int eval(GameState s) {
         // if the state at depth d is actually a terminal state, then return utility
         if(terminalTest(s)) return utility(s);
 
-        // calculate an eval based on who has control of valuable positions
         int[][] board = s.getBoard();
         int n = board.length;
-        int corner = 5; // just guessing at a weight for corner positions
-        int edge = 3; // just guessing at a weight for edge positions
+        int corner = 4; // just guessing at a weight for corner positions
+        int edge = 2; // just guessing at a weight for edge positions
 
-        // corner positions, positive if black, negative if white
-        int eval = board[0][0] == 1 ? corner : -corner;
-        eval += board[0][n-1] == 1 ? corner : -corner;
-        eval += board[n-1][0] == 1 ? corner : -corner;
-        eval += board[n-1][n-1] == 1 ? corner : -corner;
+        // corner positions, positive if thisPlayer, negative if other, nothing if blank
+        int eval = 0;
+        if(board[0][0] != 0) eval += board[0][0] == thisPlayer ? corner : -corner;
+        if(board[0][n-1] != 0) eval += board[0][n-1] == thisPlayer ? corner : -corner;
+        if(board[n-1][0] != 0) eval += board[n-1][0] == thisPlayer ? corner : -corner;
+        if(board[n-1][n-1] != 0) eval += board[n-1][n-1] == thisPlayer ? corner : -corner;
 
-
-        // add values for top and bottom row
-        for(int i = 0; i < n-1; i++) {
-            eval += board[i][0] == 1 ? edge : -edge;
-            eval += board[i][n-1] == 1 ? edge : -edge;
+        // add values for left and right column, excl. corners
+        for(int i = 1; i < n-2; i++) {
+            if(board[i][0] != 0) eval += board[i][0] == thisPlayer ? edge : -edge;
+            if(board[i][n-1] != 0)eval += board[i][n-1] == thisPlayer ? edge : -edge;
         }
 
-        // add vals for left and right column
-        for(int j = 0; j < n-1; j++) {
-            eval += board[0][j] == 1 ? edge : -edge;
-            eval += board[n-1][j] == 1 ? edge : -edge;
+        // add vals for top and bottom row, excl. corners
+        for(int j = 1; j < n-2; j++) {
+            if(board[0][j] != 0) eval += board[0][j] == thisPlayer ? edge : -edge;
+            if(board[n-1][j] != 0) eval += board[n-1][j] == thisPlayer ? edge : -edge;
         }
 
-        return eval;
+        if(eval > 0) return 1; // this player has more valuable positions
+        else if(eval < 0) return -1; // other player has more valuable positions
+
+        return 0;
     }
 
     /**
-     * Returns the utility value for a terminal gamestate
-     * @param s the gamestate
-     * @return 1 if black wins, 0 if it's a drw and -1 if white wins
+     * Returns a utility value based on the winner at this game state
+     * @param s terminal game state
+     * @return 1 if this player is the winner, -1 if other player wins and 0 if it's a tie
      */
     private static int utility(GameState s) {
+        int other = thisPlayer == 1 ? 2 : 1;
         int[] tokens = s.countTokens();
 
-        if(tokens[0] == tokens[1]) return 0;
-        else return tokens[0] > tokens[1] ? 1 : -1;
+        if(tokens[thisPlayer-1] == tokens[other-1]) return 0;
+        else return tokens[thisPlayer-1] > tokens[other-1] ? 1 : -1;
     }
 }

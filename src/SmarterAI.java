@@ -2,10 +2,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @author Sabina Hult
+ * @version 7.3.2019
  * An attempt at a smarter AI (than DumAI) using either the MINIMAX algorithm, MINIMAX with alpha-beta
  * pruning or H-MINIMAX for move decisions.
  */
 public class SmarterAI implements IOthelloAI {
+    // for calculating avg and max duration of decision
     private List<Double> times;
 
     public SmarterAI() {
@@ -26,13 +29,13 @@ public class SmarterAI implements IOthelloAI {
         Position move = HMINIMAX.decision(s);
         times.add(System.currentTimeMillis()-start);
 
-        System.out.println("Inserting [" + move.col + ", " + move.row + "]");
+        System.out.println("Done");
         return move;
     }
 
     /**
      * Calculates the average over all decideMove execution times, as well as the max.
-     * @return an array of {avg, max}
+     * @return an array of {avg, max} in doubles
      */
     public double[] getTimes() {
         double avg = times.stream().mapToDouble(Number::doubleValue).average().getAsDouble();

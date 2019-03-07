@@ -104,17 +104,17 @@ public class OthelloGUI extends JComponent implements MouseListener {
     		else
     			g.drawImage(tie, size*imgSize/2-(imgSize/2), size*imgSize/2+(imgSize/4), this);
 
-    		// added by me to print average time per decision made by SmarterAI
-			if(ai1 != null && ai1.getClass().equals(SmarterAI.class)) {
+			// added by me to print average time per decision made by SmarterAI
+			if(ai1.getClass().equals(SmarterAI.class)) {
 				SmarterAI sai = (SmarterAI) ai1;
 				double[] times = sai.getTimes();
-				System.out.println("AI1: Avg: " + times[0] + " Max: " + times[1]);
+				System.out.println(String.format("Avg : %.2f Max: %.2f", times[0]/1000, times[1]/1000));
 			}
 
-    		if(ai2 != null && ai2.getClass().equals(SmarterAI.class)) {
+			if(ai2.getClass().equals(SmarterAI.class)) {
 				SmarterAI sai = (SmarterAI) ai2;
 				double[] times = sai.getTimes();
-				System.out.println("AI2: Avg: " + times[0] + " Max: " + times[1]);
+				System.out.println(String.format("Avg : %.2f Max: %.2f", times[0]/1000, times[1]/1000));
 			}
     	}		
     }

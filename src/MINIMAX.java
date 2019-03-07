@@ -1,10 +1,13 @@
 /**
- * Author: Sabina Hult
+ * @author Sabina Hult
+ * @version 7.3.2019
  * Implementation of the MINIMAX algorithm as it is given in the pseudocode in RN p. 166
  */
-
 public class MINIMAX {
+    private static int thisPlayer;
     public static Position decision(GameState s) {
+        thisPlayer = s.getPlayerInTurn();
+
         Position move = null;
         int max_value = Integer.MIN_VALUE;
 
@@ -22,10 +25,7 @@ public class MINIMAX {
 
     private static GameState result(GameState s, Position p) {
         GameState n = new GameState(s.getBoard(), s.getPlayerInTurn());
-        if(n.insertToken(p)) return n;
-
-        // if inserting a token is unsuccessful, then change player
-        n.changePlayer();
+        n.insertToken(p);
         return n;
     }
 
@@ -56,9 +56,10 @@ public class MINIMAX {
     }
 
     public static int utility(GameState s) {
+        int other = thisPlayer == 1 ? 2 : 1;
         int[] tokens = s.countTokens();
 
-        if(tokens[0] == tokens[1]) return 0;
-        else return tokens[0] > tokens[1] ? 1 : -1;
+        if(tokens[thisPlayer -1] == tokens[other-1]) return 0;
+        else return tokens[thisPlayer -1] > tokens[other-1] ? 1 : -1;
     }
 }
