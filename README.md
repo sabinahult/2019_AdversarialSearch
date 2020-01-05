@@ -1,4 +1,4 @@
-# Minimax
+# Adversial Search: Minimax-algorithm
 
 Assignment in Intelligent Systems programming. Implementation of an adversarial search algorithm for the game Othello
 developed with Anders Fleron & Line Bay Kreiberg.
